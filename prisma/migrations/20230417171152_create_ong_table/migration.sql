@@ -9,6 +9,3 @@ CREATE TABLE "Ong" (
 
     CONSTRAINT "Ong_pkey" PRIMARY KEY ("id")
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "Ong_email_key" ON "Ong"("email");
