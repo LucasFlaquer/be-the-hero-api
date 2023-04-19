@@ -91,6 +91,19 @@ app.get('/profile', Authorization, async (request, response) => {
     data: ongData,
   })
 })
+app.delete('/incidents/:id', Authorization, async (request, response) => {
+  const { id } = request.params
+
+  try {
+    await prisma.incident.delete({ where: { id } })
+    console.log('DELETED')
+    return response.status(200).json({})
+  } catch (error: any) {
+    return response.status(401).json({
+      message: error.message,
+    })
+  }
+})
 
 app.listen(3333)
 console.log('🚀 HTTP Server is running')
