@@ -2,7 +2,10 @@ import { PrismaClient } from '@prisma/client'
 import express from 'express'
 import { z } from 'zod'
 import { Authorization } from './middlewares'
+import cors from 'cors'
+
 export const app = express()
+app.use(cors())
 app.use(express.json())
 
 const prisma = new PrismaClient()
@@ -36,19 +39,6 @@ app.post('/incidents', Authorization, async (request, response) => {
     value: z.number().min(10),
   })
   const input = bodySchema.parse(request.body)
-  const ong = await prisma.ong.update({
-    where: {
-      id: request.headers.authorization,
-    },
-    data: {
-      incidents: {
-        create: input,
-      },
-    },
-    include: {
-      incidents: true,
-    },
-  })
 
   const incident = await prisma.incident.create({
     data: { ...input, ongId: `${request.headers.authorization}` },
@@ -62,6 +52,7 @@ app.post('/incidents', Authorization, async (request, response) => {
   )
   return response.status(201).json({
     message: 'success',
+    incident,
   })
 })
 app.post('/authenticate', async (request, response) => {
@@ -71,6 +62,7 @@ app.post('/authenticate', async (request, response) => {
   try {
     const { ongId } = bodySchema.parse(request.body)
     const ong = await prisma.ong.findFirstOrThrow({ where: { id: ongId } })
+    console.log('@SUCCESS- Authentication')
     return response.status(200).json({ ong })
   } catch (error: any) {
     return response.status(401).json({
